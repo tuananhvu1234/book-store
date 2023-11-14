@@ -1,7 +1,7 @@
 package com.noproject.bookstore.service.impl;
 
-import com.noproject.bookstore.api.exception.BadRequestException;
-import com.noproject.bookstore.api.exception.NotFoundException;
+import com.noproject.bookstore.exception.BadRequestException;
+import com.noproject.bookstore.exception.NotFoundException;
 import com.noproject.bookstore.service.QueryService;
 import org.springframework.data.jpa.repository.JpaRepository;
 

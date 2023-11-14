@@ -21,7 +21,6 @@ public class RequestHandlerConfiguration {
                 AuthorDTO.class, new HandlerCollection()
         );
         authorDTOHandlers.addHandler("id", AuthorDTO::getId);
-        authorDTOHandlers.addHandler("fullName", AuthorDTO::getFullName);
         authorDTOHandlers.addHandler("penName", AuthorDTO::getPenName);
 
         /*

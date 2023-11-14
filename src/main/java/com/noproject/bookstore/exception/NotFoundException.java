@@ -1,4 +1,4 @@
-package com.noproject.bookstore.api.exception;
+package com.noproject.bookstore.exception;
 
 public class NotFoundException extends RuntimeException {
 

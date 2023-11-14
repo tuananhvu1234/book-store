@@ -1,8 +1,8 @@
-package com.noproject.bookstore.api.exception.handler;
+package com.noproject.bookstore.exception.handler;
 
-import com.noproject.bookstore.api.exception.BadRequestException;
-import com.noproject.bookstore.api.exception.InternalServerErrorException;
-import com.noproject.bookstore.api.exception.NotFoundException;
+import com.noproject.bookstore.exception.BadRequestException;
+import com.noproject.bookstore.exception.InternalServerErrorException;
+import com.noproject.bookstore.exception.NotFoundException;
 import com.noproject.bookstore.api.query.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;

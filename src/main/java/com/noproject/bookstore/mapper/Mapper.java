@@ -18,7 +18,7 @@ public abstract class Mapper<S, D> {
             handleMapping(obj, instance);
             return instance;
         } catch (Exception e) {
-            return null;
+            throw new RuntimeException(e);
         }
     }
 

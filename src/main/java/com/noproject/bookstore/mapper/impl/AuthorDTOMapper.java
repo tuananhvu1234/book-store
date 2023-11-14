@@ -15,8 +15,6 @@ public class AuthorDTOMapper extends Mapper<Author, AuthorDTO> {
 
         authorDto.setId(author.getId());
 
-        authorDto.setFullName(String.format("%s %s", author.getFirstName(), author.getLastName()));
-
         authorDto.setPenName(author.getPenName());
 
     }

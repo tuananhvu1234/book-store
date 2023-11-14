@@ -1,9 +1,10 @@
 package com.noproject.bookstore.service.extend.impl;
 
-import com.noproject.bookstore.api.exception.BadRequestException;
-import com.noproject.bookstore.api.exception.InternalServerErrorException;
-import com.noproject.bookstore.api.exception.NotFoundException;
 import com.noproject.bookstore.entity.Book;
+import com.noproject.bookstore.entity.CategoryBook;
+import com.noproject.bookstore.exception.BadRequestException;
+import com.noproject.bookstore.exception.InternalServerErrorException;
+import com.noproject.bookstore.exception.NotFoundException;
 import com.noproject.bookstore.repository.BookRepository;
 import com.noproject.bookstore.repository.CategoryBookRepository;
 import com.noproject.bookstore.service.CrudService;
@@ -17,9 +18,11 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,27 +70,30 @@ public class BookServiceImpl implements BookService {
             throw new BadRequestException(result.getReason());
         }
 
-        String shortDescription = book.getShortDescription();
-        autoShortDescription:
-        {
-            if (Objects.isNull(shortDescription) || shortDescription.isBlank()) {
-                String fullDescription = book.getFullDescription();
-                if (Objects.isNull(fullDescription)) {
-                    break autoShortDescription;
-                }
-                if (fullDescription.length() >= 100) {
-                    book.setShortDescription(fullDescription.substring(0, 200).concat("..."));
+        String description = book.getShortDescription();
+        if (Objects.isNull(description) || description.isBlank()) {
+
+            description = book.getFullDescription();
+            if (Objects.nonNull(description)) {
+                if (description.length() >= 100) {
+                    book.setShortDescription(description.substring(0, 100).concat("..."));
                 } else {
-                    book.setShortDescription(fullDescription);
+                    book.setShortDescription(description);
                 }
             }
         }
 
         try {
-            Book output = bookRepository.save(book);
-
-            categoryBookRepository.saveAll(book.getCategories());
-
+            Book output;
+            if (book.getId() != null) {
+                // update must already exist categories in database
+                saveBookCategory(book);
+                output = bookRepository.save(book);
+            } else {
+                // insert must already exist book in database
+                output = bookRepository.save(book);
+                saveBookCategory(output);
+            }
             return Optional.of(output);
         } catch (OptimisticLockingFailureException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
@@ -95,8 +101,36 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    private void saveBookCategory(Book book) {
+        Set<CategoryBook> existCategoryBooks = categoryBookRepository.findAllByBookId(book.getId());
+        if (existCategoryBooks.isEmpty()) {
+            categoryBookRepository.saveAll(book.getCategories());
+        } else {
+            Set<CategoryBook> newCategoryBooks = book.getCategories();
+
+            Set<CategoryBook> mergedCategoryBooks = new HashSet<>();
+
+            mergedCategoryBooks.addAll(existCategoryBooks);
+            mergedCategoryBooks.addAll(newCategoryBooks);
+
+            for (CategoryBook categoryBook : mergedCategoryBooks) {
+                if (existCategoryBooks.contains(categoryBook)
+                        && !newCategoryBooks.contains(categoryBook)) {
+                    categoryBookRepository.delete(categoryBook);
+                } else if (!existCategoryBooks.contains(categoryBook)
+                        && newCategoryBooks.contains(categoryBook)) {
+                    categoryBookRepository.save(categoryBook);
+                }
+            }
+        }
+    }
+
     @Override
     public Boolean delete(Book book) {
+
+        if (Objects.isNull(book)) {
+            throw new BadRequestException();
+        }
 
         final Example<Book> example = Example.of(book, ExampleMatcher.matching()
                 .withIgnorePaths("author.user")
@@ -106,15 +140,23 @@ public class BookServiceImpl implements BookService {
             throw new NotFoundException();
         }
 
+        categoryBookRepository.deleteAll(categoryBookRepository.findAllByBookId(book.getId()));
+
         return crudService.delete(book);
     }
 
     @Override
     public Boolean deleteById(Long id) {
 
+        if (Objects.isNull(id)) {
+            throw new BadRequestException();
+        }
+
         if (!bookRepository.existsById(id)) {
             throw new NotFoundException();
         }
+
+        categoryBookRepository.deleteAll(categoryBookRepository.findAllByBookId(id));
 
         return crudService.deleteById(id);
     }

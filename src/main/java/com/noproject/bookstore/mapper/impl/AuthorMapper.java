@@ -7,7 +7,6 @@ import com.noproject.bookstore.mapper.Mapper;
 import com.noproject.bookstore.repository.BookRepository;
 import com.noproject.bookstore.repository.UserRepository;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public class AuthorMapper extends Mapper<AuthorDTO, Author> {
@@ -31,13 +30,6 @@ public class AuthorMapper extends Mapper<AuthorDTO, Author> {
         author.setPenName(authorDTO.getPenName());
 
         author.setBooks(bookRepository.findAllByAuthorId(authorId));
-
-        String fullName = authorDTO.getFullName();
-        if (!Objects.isNull(fullName)) {
-            final int firstWhiteSpaceIndex = fullName.indexOf(" ");
-            author.setFirstName(fullName.substring(0, firstWhiteSpaceIndex));
-            author.setLastName(fullName.substring(firstWhiteSpaceIndex + 1));
-        }
 
         Optional<User> optional = userRepository.findByAuthorId(authorId);
         optional.ifPresent(author::setUser);

@@ -1,18 +1,19 @@
 package com.noproject.bookstore.controller;
 
-import com.noproject.bookstore.api.exception.BadRequestException;
-import com.noproject.bookstore.api.exception.InternalServerErrorException;
 import com.noproject.bookstore.api.query.ApiRequest;
 import com.noproject.bookstore.api.query.ApiResponse;
 import com.noproject.bookstore.api.query.ResponseInformation;
 import com.noproject.bookstore.api.request.PaginationRequest;
 import com.noproject.bookstore.dto.BookDTO;
 import com.noproject.bookstore.entity.Book;
+import com.noproject.bookstore.exception.BadRequestException;
+import com.noproject.bookstore.exception.InternalServerErrorException;
 import com.noproject.bookstore.mapper.Mapper;
 import com.noproject.bookstore.service.extend.BookService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -114,12 +115,14 @@ public class BookController {
         bookService.save(book);
 
         return new ApiResponse<>(HttpStatus.NO_CONTENT);
-//
-//        return new BookPutRequestHandler(
-//                bookRepository,
-//                categoryRepository,
-//                categoryBookRepository
-//        ).handle(book);
+    }
+
+    @DeleteMapping({"/{id}"})
+    public ApiResponse<Void> delete(
+            @PathVariable("id") Long id
+    ) {
+        bookService.deleteById(id);
+        return new ApiResponse<>(HttpStatus.NO_CONTENT);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.noproject.bookstore.service.extend.impl;
 
-import com.noproject.bookstore.api.exception.NotFoundException;
+import com.noproject.bookstore.exception.NotFoundException;
 import com.noproject.bookstore.entity.Author;
 import com.noproject.bookstore.repository.AuthorRepository;
 import com.noproject.bookstore.service.CrudService;

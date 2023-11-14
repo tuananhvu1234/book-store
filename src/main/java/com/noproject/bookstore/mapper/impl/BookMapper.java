@@ -11,8 +11,8 @@ import com.noproject.bookstore.entity.key.CategoryBookKey;
 import com.noproject.bookstore.mapper.Mapper;
 import com.noproject.bookstore.repository.CategoryBookRepository;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 
 public class BookMapper extends Mapper<BookDTO, Book> {
 
@@ -51,16 +51,21 @@ public class BookMapper extends Mapper<BookDTO, Book> {
 
         book.setQuantity(bookDto.getQuantity());
 
-        book.setCategories(bookDto.getCategories().stream().map(categoryDTO -> {
-            final CategoryBookKey key = new CategoryBookKey(bookId, categoryDTO.getId());
-
-            Optional<CategoryBook> optional = categoryBookRepository.findById(key);
-            return optional.orElseGet(() -> new CategoryBook(
-                    key, book, categoryMapper.map(categoryDTO)
-            ));
-        }).collect(Collectors.toSet()));
-
         book.setAuthor(authorMapper.map(bookDto.getAuthor()));
+
+        book.setCategories(new HashSet<>());
+
+        Set<CategoryBook> categoryBooks = book.getCategories();
+
+        Set<CategoryDTO> categoryDTOS = bookDto.getCategories();
+
+        for (CategoryDTO categoryDTO : categoryDTOS) {
+            CategoryBookKey key = new CategoryBookKey(bookId, categoryDTO.getId());
+
+            CategoryBook categoryBook = new CategoryBook(key, book, categoryMapper.map(categoryDTO));
+
+            categoryBooks.add(categoryBook);
+        }
 
     }
 

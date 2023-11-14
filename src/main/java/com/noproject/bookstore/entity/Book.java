@@ -115,9 +115,11 @@ public class Book implements Comparable<Book> {
             return result;
         }
 
-        result = image.compareTo(o.image);
-        if (result != 0) {
-            return result;
+        if (image != null) {
+            result = image.compareTo(o.image);
+            if (result != 0) {
+                return result;
+            }
         }
 
         result = price.compareTo(o.price);

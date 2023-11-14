@@ -13,8 +13,6 @@ public class AuthorDTO {
 
     private Long id;
 
-    private String fullName;
-
     private String penName;
 
 }

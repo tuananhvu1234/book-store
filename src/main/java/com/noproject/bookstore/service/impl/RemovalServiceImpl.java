@@ -1,7 +1,7 @@
 package com.noproject.bookstore.service.impl;
 
-import com.noproject.bookstore.api.exception.BadRequestException;
-import com.noproject.bookstore.api.exception.InternalServerErrorException;
+import com.noproject.bookstore.exception.BadRequestException;
+import com.noproject.bookstore.exception.InternalServerErrorException;
 import com.noproject.bookstore.service.RemovalService;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.jpa.repository.JpaRepository;
